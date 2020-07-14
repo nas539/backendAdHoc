@@ -51,6 +51,26 @@ class AppointmentSchema(ma.Schema):
 appointment_schema = AppointmentSchema()
 appointments_schema = AppointmentSchema(many=True)
 
+@app.route("/user/add", methods=["POST"])
+def add_user():
+    if request.content_type != "application/json":
+        return jsonify("Error")
+
+    post_data = request.get_json()
+    username = post_data.get("username")
+    password = post_data.get("password")
+
+    username_check = db.session.query(User.username).filter(User.username == username).first()
+    if username_check is not None:
+        return jsonify("Username taken")
+
+    hashed_password = bcrypt.generate_password_hash(password).decode("utf8")
+
+    record = User(username, hashed_password)
+    db.session.add(record)
+    db.session.commit()
+
+    return jsonify("User created")
 
 if __name__ == "__main__":
     app.run(debug=True)
