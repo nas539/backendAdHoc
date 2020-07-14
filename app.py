@@ -11,7 +11,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = ""
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
-
 heroku = Heroku(app)
 CORS(app)
 bcrypt = Bcrypt(app)
@@ -31,3 +30,27 @@ class UserSchema(ma.Schema):
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
+
+class Appointment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), nullable=False, unique=True)
+    title = db.Column(db.String(), nullable=False)
+    company = db.Column(db.String(), nullable=False)
+    start_date = db.Column(db.String(), nullable=False)
+
+    def __init__(self, username, title, company, start_date):
+        self.username = username
+        self.title = title
+        self.company = company
+        self.start_date = start_date
+        
+class AppointmentSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "username", "title", "company", "start_date")
+
+appointment_schema = AppointmentSchema()
+appointments_schema = AppointmentSchema(many=True)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
