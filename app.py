@@ -72,5 +72,23 @@ def add_user():
 
     return jsonify("User created")
 
+@app.route("/appointment/add", methods=["POST"])
+def add_appointment():
+    if request.content_type != "application/json":
+        return jsonify("Error")
+
+    post_data = request.get_json()
+    username = post_data.get("username")
+    title = post_data.get("title")
+    company = post_data.get("company")
+    start_date = post_data.get("start_date")
+    
+
+    new_appointment = Appointment(username, title, company, start_date)
+    db.session.add(new_appointment)
+    db.session.commit()
+
+    return jsonify("Appointment added!")
+
 if __name__ == "__main__":
     app.run(debug=True)
