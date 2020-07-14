@@ -7,7 +7,7 @@ from flask_bcrypt import Bcrypt
 import io
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = ""
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://shmddhgxfcxsvs:18ee83bc12b532b3b457d7ab803022303a35523420680fc8f338f90eea0b419e@ec2-34-197-188-147.compute-1.amazonaws.com:5432/d2dqnjknl3ugu3"
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -33,7 +33,7 @@ users_schema = UserSchema(many=True)
 
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), nullable=False, unique=True)
+    username = db.Column(db.String(20), nullable=False)
     title = db.Column(db.String(), nullable=False)
     company = db.Column(db.String(), nullable=False)
     start_date = db.Column(db.String(), nullable=False)
@@ -89,6 +89,16 @@ def add_appointment():
     db.session.commit()
 
     return jsonify("Appointment added!")
+
+@app.route("/appointment/get/data", methods=["GET"])
+def get_appointment_data():
+    appointment_data = db.session.query(Appointment).all()
+    return jsonify(appointments_schema.dump(appointment_data))
+
+@app.route("/appointment/get/data/<username>", methods=["GET"])
+def get_all_appointments_by_username(username):
+    appointment_data = db.session.query(Appointment).filter(Appointment.username == username).all()
+    return jsonify(appointments_schema.dump(appointment_data))
 
 if __name__ == "__main__":
     app.run(debug=True)
