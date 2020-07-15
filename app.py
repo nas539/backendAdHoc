@@ -36,17 +36,19 @@ class Appointment(db.Model):
     username = db.Column(db.String(20), nullable=False)
     title = db.Column(db.String(), nullable=False)
     company = db.Column(db.String(), nullable=False)
-    start_date = db.Column(db.Date(), nullable=False)
+    date = db.Column(db.Date(), nullable=True)
+    time = db.Column(db.String(), nullable=False)
 
-    def __init__(self, username, title, company, start_date):
+    def __init__(self, username, title, company, date, time):
         self.username = username
         self.title = title
         self.company = company
-        self.start_date = start_date
+        self.date = date
+        self.time = time
         
 class AppointmentSchema(ma.Schema):
     class Meta:
-        fields = ("id", "username", "title", "company", "start_date")
+        fields = ("id", "username", "title", "company", "date", "time")
 
 appointment_schema = AppointmentSchema()
 appointments_schema = AppointmentSchema(many=True)
