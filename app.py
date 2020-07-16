@@ -7,7 +7,7 @@ from flask_bcrypt import Bcrypt
 import io
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = ""
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://egtqyqfdjkjvco:1276815f46a2762bcdba5aab149f7aebb014b08288dd8c15026db20a4c9fe237@ec2-54-197-254-117.compute-1.amazonaws.com:5432/dedtfskihgbig5"
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -83,10 +83,11 @@ def add_appointment():
     username = post_data.get("username")
     title = post_data.get("title")
     company = post_data.get("company")
-    start_date = post_data.get("start_date")
+    date = post_data.get("date")
+    time = post_data.get("time")
     
 
-    new_appointment = Appointment(username, title, company, start_date)
+    new_appointment = Appointment(username, title, company, date, time)
     db.session.add(new_appointment)
     db.session.commit()
 
@@ -101,6 +102,13 @@ def get_appointment_data():
 def get_all_appointments_by_username(username):
     appointment_data = db.session.query(Appointment).filter(Appointment.username == username).all()
     return jsonify(appointments_schema.dump(appointment_data))
+
+@app.route("/appointment/delete/<id>", methods=["DELETE"])
+def delete_appointment(id):
+    appointment_data = db.session.query(Appointment).filter(Appointment.id == id).first()
+    db.session.delete(appointment_data)
+    db.session.commit()
+    return jsonify("FileDeleted")
 
 if __name__ == "__main__":
     app.run(debug=True)
